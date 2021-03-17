@@ -64,6 +64,13 @@ void loop() {
   Serial.print("Hour: ");
   Serial.println(hour);
 
+  if(hour > 12) {
+    int 12hour = (hour - 12);
+  }else{
+    int 12hour = hour;
+  }
+  
+  
   int minute = timeClient.getMinutes();
   Serial.print("Minutes: ");
   Serial.println(minute);
