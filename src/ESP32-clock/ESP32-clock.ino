@@ -12,6 +12,8 @@
 #include <WiFi.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
+#include "heltec.h"
+#include "font.h"
 
 // Replace with your network credentials
 const char *ssid     = "CC-Guest";
@@ -28,6 +30,7 @@ String weekDays[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "F
 String months[12] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
 void setup() {
+    Heltec.begin(true /*DisplayEnable Enable*/, true /*LoRa Disable*/, true /*Serial Enable*/);
   // Initialize Serial Monitor
   Serial.begin(115200);
 
@@ -106,6 +109,11 @@ void loop() {
   String date = String(year) + "-" + String(month) + "-" + String(monthDay);
   Serial.print(" date: ");
   Serial.println(date);
+
+  Heltec.display->setFont(Roboto_Mono_44);
+  Heltec.display->drawString(0, 0, (12hour + ":" + minute));
+
+  
 
   Serial.println("");
   delay(2000);
