@@ -16,8 +16,10 @@
 #include "font.h"
 int printedHour;
 // Replace with your network credentials
-const char *ssid     = "CC-Guest";
-const char *password = "SlowRust46";
+const char *ssid1     = "198Temp";
+const char *password1 = "FrankieDog22";
+const char *ssid2     = "CC-Guest";
+const char *password2 = "SlowRust46";
 
 // Define NTP Client to get time
 WiFiUDP ntpUDP;
@@ -31,17 +33,22 @@ String months[12] = {"January", "February", "March", "April", "May", "June", "Ju
 
 void setup() {
   Heltec.begin(true /*DisplayEnable Enable*/, false /*LoRa Disable*/, true /*Serial Enable*/);
+ const char *ssid = ssid1;
+ const char *password = password1;
   // Initialize Serial Monitor
   Serial.begin(115200);
   // Connect to Wi-Fi
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+  delay(2000);
+  if (WiFi.status() != WL_CONNECTED) {
+const  char *ssid = ssid2;
+const  char *password = password2;
   }
-
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+  WiFi.begin(ssid, password);
   // Initialize a NTPClient to get time
   timeClient.begin();
   // Set offset time in Seconds to adjust for your timezone, for example:
@@ -54,7 +61,13 @@ void setup() {
 
 void loop() {
   timeClient.update();
-  
+  printTime();
+  delay(1000);
+  printTime();
+  delay(1000);
+}
+
+void printTime() {
   unsigned long epochTime = timeClient.getEpochTime();
   Serial.print("Epoch Time: ");
   Serial.println(epochTime);
@@ -106,9 +119,14 @@ void loop() {
   int year = ptm->tm_year + 1900;
   Serial.print("Year: ");
   Serial.println(year);
-
+  if (((month >= 3 && monthDay >= 14) || (month > 3)) && ((month <= 11 && monthDay <= 7) || (month < 11)) && (Hour >= 2)) {
+    timeClient.setTimeOffset(-25200);
+    Serial.println("daylight savings time");
+  } else {
+    timeClient.setTimeOffset(-28800);
+  }
   //Print complete date:
-  String date = String(year) + "-" + String(month) + "-" + String(monthDay);
+  String date = String(year) + "/" + String(month) + "/" + String(monthDay);
   Serial.print(" date: ");
   Serial.println(date);
   Heltec.display->clear();
@@ -117,14 +135,8 @@ void loop() {
   Heltec.display->drawString(0, 0, printedTime);
   Serial.println("time: " + printedTime);
   Heltec.display->setFont(Roboto_Mono_12);
-  Heltec.display->drawString(35, 50, date);
+  Heltec.display->drawString(0, 50, date);
   Heltec.display->display();
-
-  delay(1000);
-  if (((month >= 3 && monthDay >= 14) || (month > 3)) && ((month <= 11 && monthDay <= 7) || (month < 11)) && (Hour >= 2)) {
-    timeClient.setTimeOffset(-25200);
-    Serial.println("daylight savings time");
-  } else {
-    timeClient.setTimeOffset(-28800);
-  }
+  Heltec.display->drawString(100, 50, String(Second));
+  Heltec.display->display();
 }
